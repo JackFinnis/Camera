@@ -53,12 +53,6 @@ struct FlipButton: View {
     }
 }
 
-struct FlipButton_Previews: PreviewProvider {
-    static var previews: some View {
-        FlipButton(angle: .constant(0))
-    }
-}
-
 struct CameraView: NSViewRepresentable {
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
