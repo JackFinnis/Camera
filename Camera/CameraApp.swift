@@ -19,25 +19,33 @@ struct CameraApp: App {
 }
 
 struct RootView: View {
-    @State var angle = Double.zero
+    @State var degrees: Double = 180
+    @State var authorized: Bool = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
     
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            CameraView()
-                .rotation3DEffect(.degrees(angle), axis: (0, 1, 0))
-            FlipButton(angle: $angle)
+        if authorized {
+            ZStack(alignment: .bottomLeading) {
+                CameraView()
+                    .rotation3DEffect(.degrees(degrees), axis: (0, 1, 0))
+                FlipButton(degrees: $degrees)
+            }
+            .ignoresSafeArea()
+        } else {
+            ProgressView()
+                .task {
+                    authorized = await AVCaptureDevice.requestAccess(for: .video)
+                }
         }
-        .ignoresSafeArea()
     }
 }
 
 struct FlipButton: View {
-    @Binding var angle: Double
+    @Binding var degrees: Double
     
     var body: some View {
         Button {
             withAnimation(.easeInOut(duration: 1)) {
-                angle += 180
+                degrees += 180
             }
         } label: {
             Image(systemName: "arrow.left.and.right.righttriangle.left.righttriangle.right.fill")
@@ -46,7 +54,7 @@ struct FlipButton: View {
                 .foregroundColor(.white)
                 .background(Color.accentColor)
                 .clipShape(Circle())
-                .rotation3DEffect(.degrees(angle), axis: (0, 1, 0))
+                .rotation3DEffect(.degrees(degrees), axis: (0, 1, 0))
         }
         .buttonStyle(.plain)
         .padding()
