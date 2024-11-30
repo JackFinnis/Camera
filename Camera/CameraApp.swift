@@ -10,11 +10,27 @@ import AVKit
 
 @main
 struct CameraApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     var body: some Scene {
         WindowGroup {
             RootView()
+                .onAppear {
+                    NSWindow.allowsAutomaticWindowTabbing = false
+                    guard let window = NSApplication.shared.windows.first,
+                          let screen = NSScreen.main
+                    else { return }
+                    window.setFrame(screen.visibleFrame, display: true)
+                }
         }
         .windowStyle(.hiddenTitleBar)
+        .commandsRemoved()
+    }
+}
+
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        true
     }
 }
 
